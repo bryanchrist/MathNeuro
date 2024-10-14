@@ -27,12 +27,12 @@ To run MathNeuro for identifying and scaling math-specific parameters, you will 
 python MathNeuro.py --model meta-llama/Llama-3.2-1B-Instruct --save_path /results_path --train_dataset data/gsm8k.csv --eval_datasets race mmlu --calibration_datasets data/race.csv data/mmlu.csv --eval_dataset_subset 200 --calibration_dataset_names Race MMLU --train_lm_eval_task gsm8k_cot --pre_train_eval --scalar 1.1
 ```
 # Running MathNeuro Ablations
-To run the ablations for MathNeuro (Wanda and random identification), you will need to run the MathNeuro_Ablations.py file. Here is an example of how to conduct the pruning experiment for Llama 3.2 1B IT: 
+To run the ablations for MathNeuro (Wanda and random identification), you will need to run the MathNeuro_Ablations.py file. Here is an example of how to conduct the pruning experiment ablations for Llama 3.2 1B IT: 
 ```bash
 python MathNeuro_Ablations.py --model meta-llama/Llama-3.2-1B-Instruct --save_path /results_path --train_dataset data/gsm8k.csv --eval_datasets race mmlu --calibration_datasets data/race.csv data/mmlu.csv --eval_dataset_subset 200 --calibration_dataset_names Race MMLU --train_lm_eval_task gsm8k_cot --pre_train_eval
 ```
 # Running LAPE
-To run the LAPE comparison method, you will need to run the LAPE.py file. Please note that if you want to run this experiment for a model other than one from the Phi 1.5, Gemma 2, or Llama 3 families, you will need to create a customized implementation of its forward loop. Here is an example of how to conduct the pruning experiment for Llama 3.2 1B IT: 
+To run the LAPE comparison method, you will need to run the LAPE.py file. Please note that if you want to run this experiment for a model other than one from the Phi 1.5, Gemma 2, or Llama 3 families, you will need to create a customized implementation of its forward loop. Here is an example of how to conduct the pruning experiment for Llama 3.2 1B IT using LAPE: 
 ```bash
 python LAPE.py --model meta-llama/Llama-3.2-1B-Instruct --save_path /results_path --train_dataset data/gsm8k.csv --eval_datasets race mmlu --calibration_datasets data/race.csv data/mmlu.csv --eval_dataset_subset 200 --calibration_dataset_names Race MMLU --train_lm_eval_task gsm8k_cot --pre_train_eval
 ```
