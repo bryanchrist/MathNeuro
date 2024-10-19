@@ -16,6 +16,7 @@ parser.add_argument('--eval_dataset_subset', help="desired number of samples for
 parser.add_argument('--calibration_dataset_names', nargs='+', help="desired name of calibration datasets; should be strings entered in same order as calibration_datasets", type = str)
 parser.add_argument('--num_samples', help="desired number of samples for calculating task specific parameters", type = int, default = 500)
 parser.add_argument('--train_lm_eval_task', help="if your training dataset is an Eleuther AI LM Evaluation Harness task, specify the associated task for the test set.", type = str, default = None)
+parser.add_argument('--proportion', help="desired proportion of top parameters to calculate", type = float, default = None)
 args = parser.parse_args()
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
@@ -370,7 +371,10 @@ def scale(good_params, factor):
 
 num_samples = args.num_samples
 num_repeats = 5
-good_percents = [.0001, .001, .005, .01, .025, .05, .1, .15]
+if args.proportion is None:
+    good_percents = [.0001, .001, .005, .01, .025, .05, .1, .15]
+if args.proportion is not None:
+    good_percents = [args.proportion]
 scalar = args.scalar
 methods = ['random', 'top_good']
 for dataset in dataset_list:
