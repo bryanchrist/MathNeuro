@@ -5,7 +5,7 @@
 Codebase for Math Neurosurgery: Isolating Language Models' Math Reasoning Abilities Using Only Forward Passes
 
 # Overview 
-INSERT ABSTRACT
+Math reasoning is a highly active area of Large Language Model (LLM) research because it is a hallmark of artificial intelligence. However, few works have explored how math reasoning is encoded within LLM parameters and if it is a skill that can be isolated within a model. Doing so could allow targeted intervention to improve math performance without altering non-math behavior and foster understanding of how models encode math reasoning. We introduce Math Neurosurgery (MathNeuro), a method for isolating math-specific parameters in LLMs using only forward passes. MathNeuro builds on existing work by using weights and activations to calculate parameter importance, but isolates math-specific parameters by removing those important for general language tasks. Pruning parameters MathNeuro identifies deletes a LLM's math reasoning ability without destroying its general language ability. Scaling these parameters by a small constant improves a pretrained or instruction-tuned LLM's performance by 4-17% on GSM8K while leaving non-math behavior unaltered. MathNeuro is also data efficient: most of its effectiveness holds when identifying math-specific parameters using a single sample. MathNeuro highlights the potential for future work to intervene on math-specific parameters.
 
 # License and Intended Use
 Our code is released under the GNU GPLv3 license. Our codebase also contains a copy of the [Eleuther AI Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness) to run all experimental evaluations. 
