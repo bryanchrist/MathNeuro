@@ -1,6 +1,6 @@
 # MathNeuro
 
-[Paper](https://arxiv.org/abs/2402.15861)
+[Paper](https://arxiv.org/abs/2410.16930)
 
 Codebase for Math Neurosurgery: Isolating Language Models' Math Reasoning Abilities Using Only Forward Passes
 
@@ -39,5 +39,13 @@ python LAPE.py --model meta-llama/Llama-3.2-1B-Instruct --save_path /results_pat
 
 # Citation
 ```bash
-INSERT
+@misc{christ2024mathneurosurgeryisolatinglanguage,
+      title={Math Neurosurgery: Isolating Language Models' Math Reasoning Abilities Using Only Forward Passes}, 
+      author={Bryan R. Christ and Zack Gottesman and Jonathan Kropko and Thomas Hartvigsen},
+      year={2024},
+      eprint={2410.16930},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2410.16930}, 
+}
 ```
