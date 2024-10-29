@@ -69,128 +69,8 @@ def oa_completion(client, chat: bool = False, **kwargs):
         else:
             return client.completions.create(**kwargs)
 
-
     return completion()
-    
-@register_model("azure-openai-chat-completions")
-class AzureOpenaiChatCompletionsLM(LM):
-    def __init__(
-        self,
-        model: str = "gpt-35-turbo",
-        truncate: bool = False,
-        **kwargs,
-    ) -> None:
-        super().__init__()
-        try:
-            import openai  # noqa: E401
-        except ModuleNotFoundError:
-            raise Exception(
-                "attempted to use 'openai' LM type, but package `openai` or `tiktoken` are not installed. \
-    please install these via `pip install lm-eval[openai]` or `pip install -e .[openai]`",
-            )
-            
-        self.model= model
-        self.api_version= "2023-07-01-preview"
-        self.azure_endpoint= os.environ["AZURE_ENDPOINT"]
-        self.api_key = os.environ["API_KEY"]
-        self.client = openai.AzureOpenAI(azure_endpoint=self.azure_endpoint, api_version=self.api_version, api_key=self.api_key)
-    @property
-    def max_length(self) -> int:
-        # Note: the OpenAI API supports up to 2049 tokens, with the first token being the first input token
-        return 2048
 
-    @property
-    def max_gen_toks(self) -> int:
-        return 256
-
-    @property
-    def batch_size(self):
-        # Isn't used because we override _loglikelihood_tokens
-        raise NotImplementedError()
-
-    @property
-    def device(self):
-        # Isn't used because we override _loglikelihood_tokens
-        raise NotImplementedError()
-
-    def generate_until(self, requests, disable_tqdm: bool = False) -> List[str]:
-        res = defaultdict(list)
-        re_ords = {}
-
-        # we group requests by their generation_kwargs,
-        # so that we don't try to execute e.g. greedy sampling and temp=0.8 sampling
-        # in the same batch.
-        grouper = lm_eval.models.utils.Grouper(requests, lambda x: str(x.args[1]))
-        for key, reqs in grouper.get_grouped().items():
-            # within each set of reqs for given kwargs, we reorder by token length, descending.
-            re_ords[key] = utils.Reorderer(
-                [req.args for req in reqs], lambda x: (-len(x[0]), x[0])
-            )
-
-        pbar = tqdm(total=len(requests), disable=(disable_tqdm or (self.rank != 0)))
-        for key, re_ord in re_ords.items():
-            # n needs to be 1 because messages in
-            # chat completion are not batch but
-            # is regarded as a single conversation.
-            chunks = lm_eval.models.utils.chunks(re_ord.get_reordered(), n=1)
-            for chunk in chunks:
-                contexts, all_gen_kwargs = zip(*chunk)
-                inps = [{"role": "user", "content": context} for context in contexts]
-
-                gen_kwargs = all_gen_kwargs[0]
-                until = None
-                if isinstance(kwargs := copy.deepcopy(gen_kwargs), dict):
-                    if "do_sample" in kwargs.keys():
-                        kwargs.pop("do_sample")
-                    if "until" in kwargs.keys():
-                        until = kwargs.pop("until")
-                        if isinstance(until, str):
-                            until = [until]
-                        elif not isinstance(until, list):
-                            raise ValueError(
-                                f"Expected repr(kwargs['until']) to be of type Union[str, list] but got {until}"
-                            )
-                        kwargs["stop"] = until
-                    kwargs["max_tokens"] = kwargs.pop("max_gen_toks", self.max_gen_toks)
-                else:
-                    raise ValueError(
-                        f"Expected repr(kwargs) to be of type repr(dict) but got {kwargs}"
-                    )
-
-                response = oa_completion(
-                    client=self.client,
-                    chat=True,
-                    messages=inps,
-                    model=self.model,
-                    **kwargs,
-                )
-
-                for resp, (context, args_) in zip(response.choices, chunk):
-                    s = resp.message.content
-
-                    if until is not None:
-                        for term in until:
-                            if len(term) > 0:
-                                s = s.split(term)[0]
-
-                    res[key].append(s)
-
-                    self.cache_hook.add_partial(
-                        "generate_until", (context, {"until": until}), s
-                    )
-                    pbar.update(1)
-            # reorder this group of results back to original unsorted form
-            res[key] = re_ord.get_original(res[key])
-
-        pbar.close()
-
-        return grouper.get_original(res)
-
-    def loglikelihood(self, requests, disable_tqdm: bool = False):
-        raise NotImplementedError("No support for logits.")
-
-    def loglikelihood_rolling(self, requests, disable_tqdm: bool = False):
-        raise NotImplementedError("No support for logits.")
 
 @register_model("openai-completions", "local-completions")
 class OpenaiCompletionsLM(TemplateLM):
@@ -259,16 +139,11 @@ class OpenaiCompletionsLM(TemplateLM):
 
         # Read from environment variable OPENAI_API_KEY
         # Set to EMPTY for local
-        #openai.api_key = os.environ["OPENAI_API_KEY"]
-        self.api_version= "2023-07-01-preview"
-        self.azure_endpoint= os.environ["AZURE_ENDPOINT"]
-        self.api_key = os.environ["API_KEY"]
+        openai.api_key = os.environ["OPENAI_API_KEY"]
         if self.base_url:
-            #self.client = openai.OpenAI(base_url=self.base_url)
-            self.client = openai.AzureOpenAI(api_version = self.api_version, azure_endpoint = self.azure_endpoint, api_key = self.api_key, base_url=self.base_url)
+            self.client = openai.OpenAI(base_url=self.base_url)
         else:
-            #self.client = openai.OpenAI()
-            self.client = openai.AzureOpenAI(api_version = self.api_version, azure_endpoint = self.azure_endpoint, api_key = self.api_key)
+            self.client = openai.OpenAI()
 
     @property
     def eot_token_id(self):
@@ -499,15 +374,10 @@ class OpenaiChatCompletionsLM(LM):
 
         # Read from environment variable OPENAI_API_KEY
         # Set to EMPTY for local
-        self.api_version= "2023-07-01-preview"
-        self.azure_endpoint= os.environ["AZURE_ENDPOINT"]
-        self.api_key = os.environ["API_KEY"]
         if self.base_url:
-            #self.client = openai.OpenAI(base_url=self.base_url)
-            self.client = openai.AzureOpenAI(api_version = self.api_version, azure_endpoint = self.azure_endpoint, api_key = self.api_key, base_url=self.base_url)
+            self.client = openai.OpenAI(base_url=self.base_url)
         else:
-            #self.client = openai.OpenAI()
-            self.client = openai.AzureOpenAI(api_version = self.api_version, azure_endpoint = self.azure_endpoint, api_key = self.api_key)
+            self.client = openai.OpenAI()  # openai.AsyncOpenAI()
 
     @property
     def max_length(self) -> int:

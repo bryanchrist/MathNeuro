@@ -39,14 +39,6 @@ class RegexFilter(Filter):
                     if isinstance(match, tuple):
                         match = [m for m in match if m][0]
                     match = match.strip()
-                    try: 
-                        if "," in match:
-                            match = match.split(",")
-                            match = "".join(match)
-                        match = float(match)
-                        match = str(match)
-                    except: 
-                        match = match
                 else:
                     match = self.fallback
                 filtered.append(match)
@@ -70,11 +62,8 @@ class WhitespaceFilter(Filter):
         def filter_set(inst):
             filtered_resp = []
             for resp in inst:
-                if resp.startswith(" "):
-                    resp = resp[1:]
-
+                resp = resp.lstrip()
                 filtered_resp.append(resp)
-
             return filtered_resp
 
         filtered_resps = [filter_set(resp) for resp in resps]

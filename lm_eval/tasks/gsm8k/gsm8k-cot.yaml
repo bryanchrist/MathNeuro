@@ -61,8 +61,8 @@ generation_kwargs:
   - 'Q:'
   - </s>
   - <|im_end|>
-#:
-#- chain_of_thought
+tag:
+- chain_of_thought
 metadata:
   version: 3.0
 metric_list:
