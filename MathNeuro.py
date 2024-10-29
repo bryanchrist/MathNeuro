@@ -235,18 +235,11 @@ if 'bad_gens_full.csv' in args.calibration_datasets:
     
         for key in keys_to_remove:
             del param_dict[key]
-        sizes = {}
-        tensors = []
-        classifier_size = 0
-        extra_inclusion_size = 0
-        all_params_size = 0
-        classifier_mask_dict = {}
-        inclusion_mask_dict = {}
+        
         mask_dict = {}
     
     
         for k, v in param_dict.items():
-            # don't count classifier layer
             if "embed" in k:
                 if prune == False:
                     mask_dict[k] = torch.zeros_like(v).to(v.device)

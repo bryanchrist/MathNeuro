@@ -234,13 +234,7 @@ if 'bad_gens_full.csv' in args.calibration_datasets:
     
         for key in keys_to_remove:
             del param_dict[key]
-        sizes = {}
-        tensors = []
-        classifier_size = 0
-        extra_inclusion_size = 0
-        all_params_size = 0
-        classifier_mask_dict = {}
-        inclusion_mask_dict = {}
+        
         mask_dict = {}
     
     
