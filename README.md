@@ -11,7 +11,7 @@ Math reasoning is a highly active area of Large Language Model (LLM) research be
 Our code is released under the GNU GPLv3 license. Our codebase also contains a copy of the [Eleuther AI Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness) to run all experimental evaluations. 
 
 # Getting Started
-After installing PyTorch (follow instructions [here](https://pytorch.org/get-started/locally/)), to install the dependencies for this codebase, you can run: 
+After installing Python>=3.10 and PyTorch (follow instructions [here](https://pytorch.org/get-started/locally/)), to install the dependencies for this codebase, you can run: 
 ```bash
 pip install -U -r requirements.txt
 ```
